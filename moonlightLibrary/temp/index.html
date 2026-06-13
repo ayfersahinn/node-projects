@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>moonlightLibrary — Kişisel Kütüphanem</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+  <div class="stars-bg" id="starsBg"></div>
+  <div class="moon-glow"></div>
+
+  <div class="page-wrap">
+    <header class="site-header">
+      <a href="index.html" class="brand">moonlightLibrary</a>
+      <p class="tagline">Ay ışığında okunan kitapların kişisel arşivi</p>
+    </header>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Kitap, yazar veya tür ara...">
+      </div>
+      <select class="form-select-dark filter-select" id="statusFilter">
+        <option value="">Tüm durumlar</option>
+        <option value="okunacak">Okunacak</option>
+        <option value="okunuyor">Okunuyor</option>
+        <option value="okundu">Okundu</option>
+      </select>
+      <a href="book-form.html" class="btn-moon btn-moon-primary">
+        <i class="fas fa-plus"></i> Kitap Ekle
+      </a>
+    </div>
+
+    <div class="books-grid" id="booksGrid"></div>
+
+    <div class="empty-state glass-card d-none" id="emptyState">
+      <i class="fas fa-book-open"></i>
+      <h3>Henüz kitap yok</h3>
+      <p>İlk kitabını ekleyerek kütüphaneni oluşturmaya başla.</p>
+      <a href="book-form.html" class="btn-moon btn-moon-primary mt-3">
+        <i class="fas fa-plus"></i> İlk Kitabı Ekle
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'moonlightLibrary_books';
+
+    function getBooks() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function saveBooks(books) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+    }
+
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+
+    function renderStars(count, rating) {
+      let html = '';
+      for (let i = 1; i <= 5; i++) {
+        html += `<i class="fas fa-star${i <= rating ? ' filled' : ''}"></i>`;
+      }
+      return html;
+    }
+
+    function statusLabel(status) {
+      const map = { okunacak: 'Okunacak', okunuyor: 'Okunuyor', okundu: 'Okundu' };
+      return map[status] || status;
+    }
+
+    function renderBooks() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const status = document.getElementById('statusFilter').value;
+      let books = getBooks();
+
+      if (query) {
+        books = books.filter(b =>
+          b.title.toLowerCase().includes(query) ||
+          b.author.toLowerCase().includes(query) ||
+          (b.genre || '').toLowerCase().includes(query)
+        );
+      }
+
+      if (status) {
+        books = books.filter(b => b.status === status);
+      }
+
+      const grid = document.getElementById('booksGrid');
+      const empty = document.getElementById('emptyState');
+
+      if (books.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('d-none');
+        return;
+      }
+
+      empty.classList.add('d-none');
+      grid.innerHTML = books.map(book => `
+        <div class="glass-card book-card" data-id="${book.id}">
+          <div class="book-cover-wrap" onclick="location.href='book-detail.html?id=${book.id}'">
+            ${book.coverImage
+              ? `<img src="${book.coverImage}" alt="${book.title}" class="book-cover">`
+              : `<div class="book-cover-placeholder"><i class="fas fa-book"></i></div>`}
+          </div>
+          <div class="book-card-body">
+            <h3 class="book-title" onclick="location.href='book-detail.html?id=${book.id}'" style="cursor:pointer">${book.title}</h3>
+            <p class="book-author">${book.author}</p>
+            <div class="book-meta-row">
+              <span class="status-badge status-${book.status}">${statusLabel(book.status)}</span>
+              <div class="stars-rating">${renderStars(5, book.rating || 0)}</div>
+            </div>
+            <div class="card-actions">
+              <a href="book-form.html?id=${book.id}" class="btn-moon btn-moon-ghost btn-moon-sm">
+                <i class="fas fa-pen"></i> Düzenle
+              </a>
+              <button class="btn-moon btn-moon-danger btn-moon-sm" onclick="deleteBook('${book.id}', event)">
+                <i class="fas fa-trash"></i> Sil
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function deleteBook(id, e) {
+      e.stopPropagation();
+      if (!confirm('Bu kitabı silmek istediğine emin misin?')) return;
+      const books = getBooks().filter(b => b.id !== id);
+      saveBooks(books);
+      renderBooks();
+      showToast('Kitap silindi');
+    }
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast-msg';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2500);
+    }
+
+    function initStarsBg() {
+      const container = document.getElementById('starsBg');
+      for (let i = 0; i < 80; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 2.5 + 1;
+        star.style.cssText = `
+          width:${size}px; height:${size}px;
+          top:${Math.random() * 100}%;
+          left:${Math.random() * 100}%;
+          --duration:${2 + Math.random() * 4}s;
+          --delay:${Math.random() * 5}s;
+          --opacity:${0.2 + Math.random() * 0.5};
+        `;
+        container.appendChild(star);
+      }
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderBooks);
+    document.getElementById('statusFilter').addEventListener('change', renderBooks);
+
+    initStarsBg();
+    renderBooks();
+
+    if (getBooks().length === 0) {
+      const samples = [
+        {
+          id: generateId(),
+          title: 'Suç ve Ceza',
+          author: 'Fyodor Dostoyevski',
+          description: 'Raskolnikov\'un iç dünyasında geçen derin bir psikolojik roman. Suç, vicdan ve kefaretle dolu bir yolculuk.',
+          coverImage: '',
+          pages: 671,
+          publisher: 'İş Bankası Kültür Yayınları',
+          publishYear: 1866,
+          isbn: '9789754584531',
+          genre: 'Klasik',
+          language: 'Türkçe',
+          rating: 5,
+          status: 'okundu',
+          quotes: [
+            { id: generateId(), text: 'İnsan, insanlığını kaybettiğinde ne olur?', page: 312, createdAt: new Date().toISOString() }
+          ],
+          comments: [
+            { id: generateId(), text: 'Her okuyuşta farklı bir katman keşfediyorum.', author: 'Ben', createdAt: new Date().toISOString() }
+          ]
+        },
+        {
+          id: generateId(),
+          title: 'Kürk Mantolu Madonna',
+          author: 'Sabahattin Ali',
+          description: 'Berlin\'de geçen, imkânsız bir aşk hikâyesi. Kısa ama derin, yürek burkan bir anlatı.',
+          coverImage: '',
+          pages: 160,
+          publisher: 'Yapı Kredi Yayınları',
+          publishYear: 1943,
+          isbn: '9789750838997',
+          genre: 'Roman',
+          language: 'Türkçe',
+          rating: 4,
+          status: 'okunuyor',
+          quotes: [],
+          comments: []
+        }
+      ];
+      saveBooks(samples);
+      renderBooks();
+    }
+  </script>
+</body>
+</html>
