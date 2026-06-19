@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const fileUpload = require("express-fileupload");
 const ejs = require("ejs");
+const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const Photo = require("./models/Photo");
 const fs = require("fs");
@@ -18,6 +19,8 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileUpload());
+app.use(methodOverride("_method"));
+
 app.get("/", async (req, res) => {
   //   res.sendFile(path.resolve(__dirname, "temp/index.html"));   //statik gönderim
   const photos = await Photo.find().sort("-dateCreated");
@@ -25,6 +28,7 @@ app.get("/", async (req, res) => {
     photos,
   });
 });
+
 app.get("/photos/:id", async (req, res) => {
   const photo = await Photo.findById(req.params.id);
   res.render("photo-detail", {
@@ -57,7 +61,16 @@ app.post("/photos", async (req, res) => {
     res.redirect("/");
   });
 });
-
+app.get("/photos/edit/:id", async (req, res) => {
+  const photo = await Photo.findOne({ _id: req.params.id });
+  res.render("edit-photo", {
+    photo,
+  });
+});
+app.put("/photos/:id", async (req, res) => {
+  await Photo.findByIdAndUpdate(req.params.id, req.body);
+  res.redirect(`/photos/${req.params.id}`);
+});
 const port = 3000;
 
 app.listen(port, () => {
