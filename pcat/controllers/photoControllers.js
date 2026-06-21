@@ -1,11 +1,21 @@
 const Photo = require("../models/Photo");
 const fs = require("fs");
+const path = require("path");
 
 exports.getAllPhotos = async (req, res) => {
   //   res.sendFile(path.resolve(__dirname, "temp/index.html"));   //statik gönderim
-  const photos = await Photo.find().sort("-dateCreated");
+
+  const page = req.query.page || 1;
+  const photosPerPage = 3;
+  const totalPhotos = await Photo.find().countDocuments();
+  const photos = await Photo.find()
+    .sort("-dateCreated")
+    .skip((page - 1) * photosPerPage)
+    .limit(photosPerPage);
   res.render("index", {
     photos,
+    current: page,
+    pages: Math.ceil(totalPhotos / photosPerPage),
   });
 };
 
@@ -19,7 +29,7 @@ exports.getPhoto = async (req, res) => {
 exports.createPhoto = async (req, res) => {
   // await Photo.create(req.body);
   // res.redirect("/");
-  const uploadDir = "/../public/uploads";
+  const uploadDir = path.join(__dirname, "../public/uploads");
   if (!fs.existsSync(uploadDir)) {
     fs.mkdir(uploadDir, (err) => {
       if (err) console.log(err);
