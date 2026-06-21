@@ -16,8 +16,9 @@
             <h2 class="subheading"><%= post.message %></h2>
             <span class="meta">Posted by
               <a href="#">Start Bootstrap</a>
-              on <%= post.formattedDate %></span>
+               Son güncelleme: <%= post.updatedAt.toLocaleString("tr-TR") %></span>
           </div>
+         
         </div>
       </div>
     </div>
@@ -30,7 +31,11 @@
         <div class="col-lg-8 col-md-10 mx-auto">
           <h2><%= post.name %></h2>
           <p><%= post.message %></p>
-          <p><small><%= post.formattedDate %></small></p>
+          <p>Son güncelleme: <small> <%= post.updatedAt.toLocaleString("tr-TR") %></small></p>
+           <div>
+            <a href="/posts/edit/<%= post._id %>" class="btn btn-info">Update</a>
+            <a href="" class="btn btn-danger ">Delete</a>
+          </div>
         </div>
       </div>
     </div>
