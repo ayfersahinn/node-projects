@@ -1,13 +1,16 @@
 const express = require("express");
+const dotenv = require("dotenv");
 const fileUpload = require("express-fileupload");
 const ejs = require("ejs");
 const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const photoController = require("./controllers/photoControllers");
 const pageController = require("./controllers/pageControllers");
-const app = new express();
 
-mongoose.connect("mongodb://localhost:27017/pcat-test-db").then(() => {
+dotenv.config();
+const app = express();
+
+mongoose.connect(process.env.MONGODB_URI).then(() => {
   console.log("MongoDB connected");
 });
 // template engine
@@ -35,7 +38,7 @@ app.get("/add-photo", pageController.getAddPage);
 
 app.get("/photos/edit/:id", pageController.getEditPage);
 
-const port = 3000;
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
   console.log(`sunucu ${port} portunda çalışıyor.`);
