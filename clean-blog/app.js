@@ -54,6 +54,11 @@ app.put("/posts/:id", async (req, res) => {
   await Post.findByIdAndUpdate(req.params.id, req.body);
   res.redirect(`/posts/${req.params.id}`);
 });
+
+app.delete("/posts/:id", async (req, res) => {
+  await Post.findByIdAndDelete(req.params.id);
+  res.redirect("/");
+});
 const port = 3000;
 app.listen(port, () => {
   console.log(`Sunucu ${port} portunda çalışıyor.`);

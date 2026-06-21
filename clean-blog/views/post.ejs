@@ -34,7 +34,7 @@
           <p>Son güncelleme: <small> <%= post.updatedAt.toLocaleString("tr-TR") %></small></p>
            <div>
             <a href="/posts/edit/<%= post._id %>" class="btn btn-info">Update</a>
-            <a href="" class="btn btn-danger ">Delete</a>
+            <a href="/posts/<%= post._id %>?_method=DELETE" onclick="return confirm('Are you sure?')" class="btn btn-danger ">Delete</a>
           </div>
         </div>
       </div>
