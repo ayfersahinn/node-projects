@@ -16,10 +16,11 @@ I am actively learning backend development with Node.js. This repository include
 
 ## 📁 Project Structure
 
-Each folder in this repository represents a separate project:
-/pcat
-/clean-blog
-/moonlightLibrary
+| Project | Description | Demo |
+|----------|------------|------|
+| **PCAT** | Photo sharing and management application. | [Demo](https://pcat-xf1r.onrender.com/) |
+| **Clean Blog** | Blog application with CRUD operations and MVC architecture. | Coming Soon |
+
 
 ## 📌 Goals
 
