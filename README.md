@@ -19,7 +19,7 @@ I am actively learning backend development with Node.js. This repository include
 | Project | Description | Demo |
 |----------|------------|------|
 | **PCAT** | Photo sharing and management application. | [Demo](https://pcat-xf1r.onrender.com/) |
-| **Clean Blog** | Blog application with CRUD operations and MVC architecture. | Coming Soon |
+| **Clean Blog** | Blog application with CRUD operations and MVC architecture. | [Demo](https://clean-blog-8ghg.onrender.com) |
 
 
 ## 📌 Goals
