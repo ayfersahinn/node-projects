@@ -31,12 +31,10 @@ exports.createPhoto = async (req, res) => {
   // res.redirect("/");
   const uploadDir = path.join(__dirname, "../public/uploads");
   if (!fs.existsSync(uploadDir)) {
-    fs.mkdir(uploadDir, (err) => {
-      if (err) console.log(err);
-    });
+    fs.mkdirSync(uploadDir, { recursive: true });
   }
   let uploadImage = req.files.image;
-  let uploadPath = __dirname + "/../public/uploads/" + uploadImage.name;
+  let uploadPath = path.join(__dirname, "../public/uploads", uploadImage.name);
   uploadImage.mv(uploadPath, async () => {
     await Photo.create({
       ...req.body,

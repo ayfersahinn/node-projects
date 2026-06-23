@@ -25,9 +25,9 @@ app.use(
     methods: ["POST", "GET"],
   }),
 );
+app.use("/uploads", express.static("public/uploads"));
 
 app.get("/", photoController.getAllPhotos);
-
 app.get("/photos/:id", photoController.getPhoto);
 app.post("/photos", photoController.createPhoto);
 app.put("/photos/:id", photoController.updatePhoto);
