@@ -7,7 +7,7 @@ exports.getAllPosts = async (req, res) => {
   const totalPost = await Post.find().countDocuments();
 
   const posts = await Post.find()
-    .sort("-dateCreated")
+    .sort("-createdAt")
     .skip((page - 1) * postperPage)
     .limit(postperPage);
   res.render("index", {
