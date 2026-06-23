@@ -1,16 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const methodOverride = require("method-override");
 const ejs = require("ejs");
 const Post = require("./models/Post");
 const PostController = require("./controllers/PostController");
 const PageController = require("./controllers/PageControllers");
 
+dotenv.config();
 const app = new express();
 
 // db connection
 mongoose
-  .connect("mongodb://localhost:27017/cleanblog-test-db")
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log("connected mongodb"))
   .catch((err) => console.log(err));
 
@@ -35,7 +37,7 @@ app.get("/about", PageController.getAboutPage);
 app.get("/add_post", PageController.getAddPage);
 app.get("/posts/edit/:id", PageController.getEditPage);
 
-const port = 3000;
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`Sunucu ${port} portunda çalışıyor.`);
 });
