@@ -28,11 +28,13 @@ exports.loginUser = async (req, res) => {
 
     const same = await bcrypt.compare(password, user.password);
 
-    if (!same) {
+    if (same) {
+      req.session.UserID = user._id;
+    } else {
       return res.status(400).send("Wrong password");
     }
 
-    res.status(200).send("You are logged in");
+    res.status(200).redirect("/");
   } catch (error) {
     res.status(400).json({
       status: "failed",
