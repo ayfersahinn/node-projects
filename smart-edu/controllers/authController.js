@@ -34,7 +34,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).send("Wrong password");
     }
 
-    res.status(200).redirect("/");
+    res.status(200).redirect("/users/dashboard");
   } catch (error) {
     res.status(400).json({
       status: "failed",
